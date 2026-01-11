@@ -1,39 +1,46 @@
 <!DOCTYPE html>
-<!-- original:https://codepen.io/boudra/pen/raErwP -->
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendar</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendar</title>
 
-    <style>
+<style>
 body {
     font-family: 'Arial', sans-serif;
     background-color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 /* 整體表格背景 */
-table {
+#calendari table {
     border-collapse: collapse;
     table-layout: fixed;
     box-shadow: 0px 1px 3px rgba(0,0,0,0.2);
     background-color: #fff;
-    position: absolute;
+    margin: 0 auto;
 }
 
+/* 單元格樣式 */
 td, th {
     text-align: center;
     background-color: #fff;
 }
 
-/* ===== 標題列（月份 / 年份）===== */
+/* 標題列（月份 / 年份） */
 th {
     padding: 10px;
     border-top: 1px solid rgba(0,0,0,0.1);
     border-right: 1px solid rgba(0,0,0,0.1);
-    background-color: #DC9FB4; /* 主色 */
+    background-color: #DC9FB4;
     color: #fff;
     font-weight: normal;
+    position: relative;
 }
 
 th .any {
@@ -42,7 +49,7 @@ th .any {
     color: rgba(255,255,255,0.85);
 }
 
-/* ===== 日期文字 ===== */
+/* 日期文字 */
 td > span {
     color: #555;
     padding: 10px;
@@ -53,16 +60,17 @@ td > span {
 
 /* 週末文字顏色 */
 td:last-child > span,
-td:nth-child(6) > span {
+td:nth-child(7) > span {
     color: #64363C;
 }
 
-/* 今天 */
+/* 今天樣式 */
 td.avui > span {
     font-weight: bold;
     background-color: #DC9FB4;
     color: #fff;
     border-radius: 6px;
+    box-shadow: 0 0 5px rgba(220,159,180,0.6);
 }
 
 /* 非本月日期 */
@@ -77,9 +85,9 @@ td > span:hover {
     border-radius: 6px;
 }
 
-/* ===== 切換月份按鈕 ===== */
+/* 切換月份按鈕 */
 .boto-next, .boto-prev {
-    background-color: #E8C7D1; /* 我幫你選的柔粉 */
+    background-color: #E8C7D1;
     color: #64363C;
     border: none;
     font-size: 18px;
@@ -89,31 +97,34 @@ td > span:hover {
     border-radius: 50%;
     position: absolute;
     top: 15px;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
 }
+
+.boto-next { right: 10px; }
+.boto-prev { left: 10px; }
 
 .boto-next:hover,
 .boto-prev:hover {
     background-color: #DC9FB4;
     color: #fff;
 }
-button:hover { cursor: pointer; }
-button:focus { outline: none; }
 
+/* Footer */
 footer {
-  text-align: center;
-  color: #ddd;
-  font-weight: normal;
-  text-shadow: 0px -1px 0px rgba(0, 0, 0, 0.2);
-  font-size: 0.8em;
-  padding: 20px;
+    text-align: center;
+    color: #ddd;
+    font-weight: normal;
+    font-size: 0.8em;
+    padding: 20px;
 }
 
 footer a,
 footer a:link {
-  color: #fff;
-  text-decoration: none;
+    color: #fff;
+    text-decoration: none;
 }
+
 /* ===== 顯示 / 動畫用（必要）===== */
 .actiu {
     position: relative;
@@ -135,49 +146,19 @@ footer a:link {
     opacity: 0;
     transform: translateX(50px);
 }
-
-
-    </style>
+</style>
 </head>
+
 <body>
-    <div class="">
-        <div id="calendari"></div>
-      </div>
-      <script>
-        var mesos = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December'
+<div id="calendari"></div>
+
+<script>
+var mesos = [
+    'January','February','March','April','May','June',
+    'July','August','September','October','November','December'
 ];
 
-var dies = [
-    'Sunday',
-    'Monday',
-    'Tuesday',
-    'Wedensday',
-    'Thursday',
-    'Friday',
-    'Saturday'
-];
-
-var dies_abr = [
-    'Su',
-    'Mo',
-    'Tu',
-    'We',
-    'Th',
-    'Fr',
-    'Sa'
-];
+var dies_abr = ['Su','Mo','Tu','We','Th','Fr','Sa'];
 
 Number.prototype.pad = function(num) {
     var str = '';
@@ -186,36 +167,32 @@ Number.prototype.pad = function(num) {
     return str += this.toString();
 }
 
-function calendari(widget, data)
-{
-
+function calendari(widget, data) {
     var original = widget.getElementsByClassName('actiu')[0];
 
-    if(typeof original === 'undefined')
-    {
+    if(typeof original === 'undefined') {
         original = document.createElement('table');
         original.setAttribute('data-actual',
-			      data.getFullYear() + '/' +
-			      data.getMonth().pad(2) + '/' +
-			      data.getDate().pad(2))
+            data.getFullYear() + '/' +
+            data.getMonth().pad(2) + '/' +
+            data.getDate().pad(2)
+        )
         widget.appendChild(original);
     }
 
     var diff = data - new Date(original.getAttribute('data-actual'));
-
     diff = new Date(diff).getMonth();
 
     var e = document.createElement('table');
-
-    e.className = diff  === 0 ? 'amagat-esquerra' : 'amagat-dreta';
+    e.className = diff === 0 ? 'amagat-esquerra' : 'amagat-dreta';
     e.innerHTML = '';
-
     widget.appendChild(e);
 
     e.setAttribute('data-actual',
-                   data.getFullYear() + '/' +
-                   data.getMonth().pad(2) + '/' +
-                   data.getDate().pad(2))
+        data.getFullYear() + '/' +
+        data.getMonth().pad(2) + '/' +
+        data.getDate().pad(2)
+    )
 
     var fila = document.createElement('tr');
     var titol = document.createElement('th');
@@ -230,16 +207,14 @@ function calendari(widget, data)
     boto_next.innerHTML = '&#9656;';
 
     titol.appendChild(boto_prev);
-    titol.appendChild(document.createElement('span')).innerHTML = 
+    titol.appendChild(document.createElement('span')).innerHTML =
         mesos[data.getMonth()] + '<span class="any">' + data.getFullYear() + '</span>';
-
     titol.appendChild(boto_next);
 
     boto_prev.onclick = function() {
         data.setMonth(data.getMonth() - 1);
         calendari(widget, data);
     };
-
     boto_next.onclick = function() {
         data.setMonth(data.getMonth() + 1);
         calendari(widget, data);
@@ -249,72 +224,49 @@ function calendari(widget, data)
     e.appendChild(fila);
 
     fila = document.createElement('tr');
-
-    for(var i = 1; i < 7; i++)
-    {
+    for(var i = 0; i < 7; i++) {
         fila.innerHTML += '<th>' + dies_abr[i] + '</th>';
     }
-
-    fila.innerHTML += '<th>' + dies_abr[0] + '</th>';
     e.appendChild(fila);
 
-    /* Obtinc el dia que va acabar el mes anterior */
-    var inici_mes =
-        new Date(data.getFullYear(), data.getMonth(), -1).getDay();
+    var inici_mes = new Date(data.getFullYear(), data.getMonth(), -1).getDay();
+    var actual = new Date(data.getFullYear(), data.getMonth(), -inici_mes);
 
-    var actual = new Date(data.getFullYear(),
-			  data.getMonth(),
-			  -inici_mes);
-
-    /* 6 setmanes per cobrir totes les posiblitats
-     *  Quedaria mes consistent alhora de mostrar molts mesos 
-     *  en una quadricula */
-    for(var s = 0; s < 6; s++)
-    {
+    for(var s = 0; s < 6; s++) {
         var fila = document.createElement('tr');
-
-        for(var d = 1; d < 8; d++)
-        {
-	    var cela = document.createElement('td');
-	    var span = document.createElement('span');
-
-	    cela.appendChild(span);
-
+        for(var d = 0; d < 7; d++) {
+            var cela = document.createElement('td');
+            var span = document.createElement('span');
+            cela.appendChild(span);
             span.innerHTML = actual.getDate();
 
             if(actual.getMonth() !== data.getMonth())
                 cela.className = 'fora';
 
-            /* Si es avui el decorem */
             if(data.getDate() == actual.getDate() &&
-	       data.getMonth() == actual.getMonth())
-		cela.className = 'avui';
+               data.getMonth() == actual.getMonth())
+                cela.className = 'avui';
 
-	    actual.setDate(actual.getDate()+1);
+            actual.setDate(actual.getDate()+1);
             fila.appendChild(cela);
         }
-
         e.appendChild(fila);
     }
 
     setTimeout(function() {
         e.className = 'actiu';
-        original.className +=
-        diff === 0 ? ' amagat-dreta' : ' amagat-esquerra';
+        original.className += diff === 0 ? ' amagat-dreta' : ' amagat-esquerra';
     }, 20);
 
     original.className = 'inactiu';
-
     setTimeout(function() {
         var inactius = document.getElementsByClassName('inactiu');
         for(var i = 0; i < inactius.length; i++)
             widget.removeChild(inactius[i]);
     }, 1000);
-
 }
 
 calendari(document.getElementById('calendari'), new Date());
-
-    </script>
+</script>
 </body>
 </html>
