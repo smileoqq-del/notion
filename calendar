@@ -114,6 +114,29 @@ footer a:link {
   color: #fff;
   text-decoration: none;
 }
+/* ===== 顯示 / 動畫用（必要）===== */
+.actiu {
+    position: relative;
+    opacity: 1;
+    transition: all 0.5s ease;
+}
+
+.inactiu {
+    position: absolute;
+    opacity: 0;
+}
+
+.amagat-esquerra {
+    opacity: 0;
+    transform: translateX(-50px);
+}
+
+.amagat-dreta {
+    opacity: 0;
+    transform: translateX(50px);
+}
+
+
     </style>
 </head>
 <body>
